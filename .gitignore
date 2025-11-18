@@ -1,16 +1,21 @@
 # Dependencies
 node_modules/
 package-lock.json
+yarn.lock
 
-# Environment variables
+# Environment files
 .env
 .env.local
-.env.production
+.env.production.local
 
 # Build outputs
 dist/
 build/
 *.log
+
+# OS files
+.DS_Store
+Thumbs.db
 
 # IDE
 .vscode/
@@ -18,18 +23,9 @@ build/
 *.swp
 *.swo
 
-# OS
-.DS_Store
-Thumbs.db
-
 # Uploads
-uploads/
-!uploads/.gitkeep
+server/uploads/*
+!server/uploads/.gitkeep
 
-# Testing
-coverage/
-
-# Misc
-*.pem
-*.key
-.cache/
+# Docker
+docker-compose.override.yml

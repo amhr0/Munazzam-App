@@ -1,0 +1,63 @@
+version: '3.8'
+
+services:
+  # قاعدة البيانات MongoDB
+  mongodb:
+    image: mongo:5
+    container_name: munazzam-mongodb
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    environment:
+      MONGO_INITDB_DATABASE: munazzam
+    networks:
+      - munazzam-network
+
+  # الخادم (Backend)
+  backend:
+    build: ./server
+    container_name: munazzam-backend
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    environment:
+      - NODE_ENV=production
+      - PORT=5000
+      - MONGODB_URI=mongodb://mongodb:27017/munazzam
+      - JWT_SECRET=gpD7rS/U6lzCMt8Ot82619E2wW6ZU1JxM1NmqEbSFnw=
+      - DEEPSEEK_API_KEY=sk-4cf8a3948ce84902a87fa296198c7988
+      - OPENAI_API_KEY=sk-4cf8a3948ce84902a87fa296198c7988
+      - FRONTEND_URL=http://localhost:3000
+      - MAX_FILE_SIZE=104857600
+      - UPLOAD_DIR=./uploads
+    depends_on:
+      - mongodb
+    volumes:
+      - ./server/uploads:/app/uploads
+    networks:
+      - munazzam-network
+
+  # الواجهة الأمامية (Frontend)
+  frontend:
+    build: 
+      context: ./client
+      args:
+        - VITE_API_URL=http://localhost:5000/api
+    container_name: munazzam-frontend
+    restart: unless-stopped
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+    networks:
+      - munazzam-network
+
+volumes:
+  mongo-data:
+    driver: local
+
+networks:
+  munazzam-network:
+    driver: bridge

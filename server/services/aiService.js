@@ -1,4 +1,7 @@
 import deepseekService from './deepseekService.js';
+import axios from 'axios';
+import FormData from 'form-data';
+import fs from 'fs';
 
 class AIService {
   constructor() {
@@ -30,11 +33,37 @@ class AIService {
     return await this.deepseek.generateScorecardSuggestions(transcript, competencies);
   }
 
-  // Transcribe audio
+  // Transcribe audio using OpenAI Whisper
   async transcribeAudio(audioFilePath) {
-    // DeepSeek doesn't support audio transcription
-    // You'll need to integrate another service like Whisper
-    throw new Error('تحويل الصوت إلى نص غير متاح حالياً. يرجى استخدام خدمة Whisper أو خدمة أخرى.');
+    // التأكد من وجود مفتاح OpenAI
+    if (!process.env.OPENAI_API_KEY) {
+      throw new Error('مفتاح OPENAI_API_KEY غير موجود. يرجى إضافته في ملف .env لتفعيل خدمة تحويل الصوت.');
+    }
+
+    try {
+      const formData = new FormData();
+      formData.append('file', fs.createReadStream(audioFilePath));
+      formData.append('model', 'whisper-1');
+      formData.append('language', 'ar'); // تحديد اللغة العربية (اختياري)
+
+      const response = await axios.post(
+        'https://api.openai.com/v1/audio/transcriptions',
+        formData,
+        {
+          headers: {
+            'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+            ...formData.getHeaders(),
+          },
+          maxContentLength: Infinity,
+          maxBodyLength: Infinity,
+        }
+      );
+
+      return response.data.text;
+    } catch (error) {
+      console.error('Whisper API Error:', error.response?.data || error.message);
+      throw new Error('فشل في تحويل الملف الصوتي إلى نص. تأكد من صحة مفتاح OpenAI API.');
+    }
   }
 }
 
