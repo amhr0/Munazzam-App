@@ -20,11 +20,13 @@ services:
       timeout: 5s
       retries: 5
 
-  # الذاكرة السريعة (Redis Queue) - داخلي فقط
+  # الذاكرة السريعة (Redis Queue)
   redis:
     image: redis:alpine
     container_name: munazzam-redis
     restart: unless-stopped
+    ports:
+      - "6379:6379"
     networks:
       - munazzam-network
 

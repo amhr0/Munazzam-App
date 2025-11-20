@@ -1,6 +1,10 @@
 # مرحلة البناء
 FROM node:18-alpine AS build
 
+# تعريف متغير البناء
+ARG VITE_API_URL=http://localhost:5000/api
+ENV VITE_API_URL=$VITE_API_URL
+
 WORKDIR /app
 
 # نسخ ملفات package
@@ -11,6 +15,9 @@ RUN npm install
 
 # نسخ باقي الملفات
 COPY . .
+
+# إنشاء config.js مع API URL الصحيح
+RUN echo "export const API_URL = '${VITE_API_URL}';" > src/config.js
 
 # بناء التطبيق للإنتاج
 RUN npm run build

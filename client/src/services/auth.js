@@ -1,6 +1,7 @@
 import axios from 'axios';
+import { API_URL as BASE_URL } from '../config.js';
 
-const API_URL = 'http://localhost:5000/api/auth';
+const API_URL = `${BASE_URL}/auth`;
 
 export const setAuthToken = (token) => {
     if (token) {
