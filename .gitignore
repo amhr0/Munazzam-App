@@ -3,10 +3,17 @@ node_modules/
 package-lock.json
 yarn.lock
 
-# Environment files
+# Environment files (NEVER commit these!)
 .env
+.env.*
+!.env.example
 .env.local
+.env.production
 .env.production.local
+.env.development
+.env.test
+server/.env
+client/.env
 
 # Build outputs
 dist/

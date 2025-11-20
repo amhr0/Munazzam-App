@@ -4,6 +4,7 @@ import path from 'path';
 import { protect } from '../middleware/authMiddleware.js';
 import meetingService from '../services/meetingService.js';
 import fs from 'fs';
+import { multerFileFilter, validateUploadedFile, sanitizeFilename } from '../middleware/fileValidation.js';
 
 const router = express.Router();
 
@@ -20,23 +21,19 @@ const storage = multer.diskStorage({
   },
   filename: (req, file, cb) => {
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    cb(null, 'recording-' + uniqueSuffix + path.extname(file.originalname));
+    const sanitizedName = sanitizeFilename(file.originalname);
+    const ext = path.extname(sanitizedName);
+    cb(null, 'recording-' + uniqueSuffix + ext);
   }
 });
 
 const upload = multer({
   storage,
-  limits: { fileSize: 100 * 1024 * 1024 }, // 100MB limit
-  fileFilter: (req, file, cb) => {
-    const allowedTypes = /mp3|wav|m4a|webm|mp4/;
-    const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
-    const mimetype = allowedTypes.test(file.mimetype);
-    
-    if (mimetype && extname) {
-      return cb(null, true);
-    }
-    cb(new Error('Only audio files are allowed'));
-  }
+  limits: { 
+    fileSize: 50 * 1024 * 1024, // 50MB limit (reduced from 100MB)
+    files: 1 // Only one file at a time
+  },
+  fileFilter: multerFileFilter
 });
 
 // Use protect middleware
@@ -169,7 +166,7 @@ router.delete('/:id', authMiddleware, async (req, res) => {
 });
 
 // Upload and process recording
-router.post('/:id/recording', authMiddleware, upload.single('audio'), async (req, res) => {
+router.post('/:id/recording', authMiddleware, upload.single('audio'), validateUploadedFile, async (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({

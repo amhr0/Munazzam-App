@@ -1,0 +1,239 @@
+# Munazzam Project - Cursor Rules
+
+## Project Overview
+Munazzam is an AI-powered cognitive assistant for productivity and HR management built with MERN stack (MongoDB, Express, React, Node.js) and integrated with OpenAI/DeepSeek for AI capabilities.
+
+## Tech Stack
+- **Frontend**: React 19, Vite, Tailwind CSS, React Router, Axios
+- **Backend**: Node.js, Express, MongoDB, Mongoose
+- **AI**: OpenAI API, DeepSeek API, Whisper API
+- **Authentication**: JWT, Passport (Google OAuth, Microsoft OAuth)
+- **Deployment**: Docker, Docker Compose
+
+## Code Style Guidelines
+
+### General
+- Use ES6+ modern JavaScript syntax
+- Use async/await instead of promises chains
+- Always use try-catch for error handling
+- Add JSDoc comments for complex functions
+- Use meaningful variable and function names in Arabic or English
+
+### Backend (Node.js/Express)
+- Use ES modules (import/export) not CommonJS (require)
+- Always validate user input before processing
+- Sanitize all inputs to prevent NoSQL injection
+- Use middleware for authentication and authorization
+- Return consistent API responses: `{ success: boolean, message: string, data?: any }`
+- Use HTTP status codes correctly (200, 201, 400, 401, 403, 404, 500)
+- Log errors with context information
+- Never expose sensitive data in error messages
+
+### Frontend (React)
+- Use functional components with hooks
+- Use React Router for navigation
+- Use Axios for API calls with interceptors
+- Handle loading and error states properly
+- Validate forms before submission
+- Use Tailwind CSS for styling
+- Support RTL for Arabic language
+- Never store sensitive data in localStorage (use httpOnly cookies)
+
+### Security Best Practices
+- **JWT**: Store tokens in httpOnly cookies, not localStorage
+- **File Upload**: Validate file type using magic bytes, not just extension
+- **Input Validation**: Validate and sanitize all user inputs
+- **NoSQL Injection**: Use mongoSanitize middleware
+- **XSS**: Use DOMPurify for HTML sanitization
+- **CORS**: Configure CORS properly with whitelist
+- **Rate Limiting**: Apply rate limiting to all API endpoints
+- **API Keys**: Never commit API keys, use environment variables
+- **Passwords**: Hash passwords with bcrypt (min 10 rounds)
+- **HTTPS**: Always use HTTPS in production
+
+### Database (MongoDB)
+- Use Mongoose schemas with validation
+- Add indexes for frequently queried fields
+- Use transactions for multi-document operations
+- Never expose MongoDB errors to clients
+- Use projection to limit returned fields
+- Implement pagination for large datasets
+
+### API Design
+- Use RESTful conventions
+- Version your API (e.g., /api/v1/)
+- Use plural nouns for resources (e.g., /users, /meetings)
+- Use HTTP methods correctly (GET, POST, PUT, PATCH, DELETE)
+- Return appropriate status codes
+- Include metadata in responses (total, page, limit)
+
+### Error Handling
+- Use centralized error handling middleware
+- Log errors with stack traces in development
+- Return user-friendly error messages
+- Never expose internal errors to clients
+- Use custom error classes for different error types
+
+### Testing
+- Write unit tests for business logic
+- Write integration tests for API endpoints
+- Use Jest for testing
+- Mock external dependencies
+- Aim for 80%+ code coverage
+
+### Documentation
+- Document all API endpoints
+- Use JSDoc for function documentation
+- Keep README.md up to date
+- Document environment variables
+- Include setup instructions
+
+## File Structure
+```
+munazzam/
+├── client/                 # React Frontend
+│   ├── src/
+│   │   ├── pages/         # Page components
+│   │   ├── contexts/      # React contexts
+│   │   ├── services/      # API services
+│   │   └── App.jsx        # Main component
+│   ├── package.json
+│   └── vite.config.js
+├── server/                # Node.js Backend
+│   ├── models/           # Mongoose models
+│   ├── routes/           # Express routes
+│   ├── services/         # Business logic
+│   ├── middleware/       # Express middleware
+│   ├── server.js         # Entry point
+│   └── package.json
+├── docker-compose.yml    # Docker configuration
+└── README.md
+```
+
+## Environment Variables
+- Never commit .env files
+- Use .env.example as template
+- Validate required env vars on startup
+- Use strong secrets for JWT_SECRET
+- Rotate API keys regularly
+
+## Git Workflow
+- Use meaningful commit messages
+- Follow conventional commits format
+- Create feature branches for new features
+- Use pull requests for code review
+- Keep commits small and focused
+
+## Performance Optimization
+- Use indexes for database queries
+- Implement caching (Redis)
+- Compress responses (gzip)
+- Optimize images and assets
+- Use CDN for static files
+- Implement lazy loading
+- Use code splitting
+
+## Monitoring and Logging
+- Log all errors with context
+- Monitor API response times
+- Track user actions
+- Set up alerts for critical errors
+- Use structured logging (JSON)
+
+## Deployment
+- Use Docker for containerization
+- Use environment-specific configs
+- Implement health checks
+- Use reverse proxy (Nginx)
+- Enable HTTPS with Let's Encrypt
+- Set up automated backups
+- Implement CI/CD pipeline
+
+## Common Patterns
+
+### API Response Format
+```javascript
+// Success
+{
+  success: true,
+  message: "عملية ناجحة",
+  data: { ... }
+}
+
+// Error
+{
+  success: false,
+  message: "حدث خطأ",
+  error: "تفاصيل الخطأ" // only in development
+}
+```
+
+### Error Handling Pattern
+```javascript
+try {
+  // Your code here
+} catch (error) {
+  console.error('Context:', error);
+  return res.status(500).json({
+    success: false,
+    message: 'رسالة خطأ واضحة للمستخدم'
+  });
+}
+```
+
+### Authentication Pattern
+```javascript
+// Protect routes with middleware
+router.get('/protected', protect, async (req, res) => {
+  // req.user is available here
+});
+```
+
+### Validation Pattern
+```javascript
+// Validate input before processing
+if (!email || !password) {
+  return res.status(400).json({
+    success: false,
+    message: 'الرجاء إدخال جميع الحقول المطلوبة'
+  });
+}
+```
+
+## Priority Fixes Needed
+
+### 🔴 Critical Security Issues
+1. Fix JWT token validation in authMiddleware.js
+2. Secure file uploads with magic bytes validation
+3. Prevent NoSQL injection with input sanitization
+4. Move tokens from localStorage to httpOnly cookies
+5. Remove exposed API keys from docker-compose.yml
+
+### 🟡 Important Bugs
+1. Fix middleware naming inconsistency (protect vs authenticate)
+2. Add proper error handling in all routes
+3. Implement rate limiting correctly
+4. Add input validation schemas
+
+### 🟢 Enhancements
+1. Complete OAuth integration
+2. Add comprehensive testing
+3. Improve UI/UX
+4. Add API documentation
+
+## When Making Changes
+1. Always read the existing code first
+2. Understand the context and dependencies
+3. Make small, incremental changes
+4. Test each change before moving to the next
+5. Update documentation if needed
+6. Follow the security best practices
+7. Keep the code clean and maintainable
+
+## Questions to Ask Before Coding
+- Is this change necessary?
+- Does it follow security best practices?
+- Will it break existing functionality?
+- Is it properly tested?
+- Is it documented?
+- Does it follow the project conventions?

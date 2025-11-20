@@ -2,9 +2,11 @@ import express from 'express';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import cors from 'cors';
+import cookieParser from 'cookie-parser';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { generalLimiter } from './middleware/rateLimiter.js';
+import { mongoSanitizeMiddleware, sanitizeRequest } from './middleware/inputSanitization.js';
 
 // Routes
 import authRoutes from './routes/auth.js';
@@ -69,11 +71,28 @@ app.use(cors(corsOptions));
 app.use(express.json({ limit: '10mb' })); 
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
+// Cookie parser
+app.use(cookieParser());
+
+// Input sanitization (prevent NoSQL injection)
+app.use(mongoSanitizeMiddleware);
+app.use(sanitizeRequest);
+
 // Rate limiting
 app.use(generalLimiter.middleware());
 
-// Static files for uploads
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+// Static files for uploads (protected with authentication)
+import { protect as uploadProtect } from './middleware/authMiddleware.js';
+app.use('/uploads', uploadProtect, express.static(path.join(__dirname, 'uploads'), {
+  setHeaders: (res, filePath) => {
+    // Prevent caching of sensitive files
+    res.set('Cache-Control', 'no-store, no-cache, must-revalidate, private');
+    res.set('Pragma', 'no-cache');
+    res.set('Expires', '0');
+    // Prevent files from being embedded in other sites
+    res.set('X-Frame-Options', 'DENY');
+  }
+}));
 
 // Request logging (development only)
 if (process.env.NODE_ENV === 'development') {

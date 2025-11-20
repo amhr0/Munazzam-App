@@ -3,6 +3,7 @@ import { protect } from '../middleware/authMiddleware.js';
 import User from '../models/User.js';
 import Meeting from '../models/Meeting.js';
 import Subscription from '../models/Subscription.js';
+import { buildSafeRegexFilter } from '../middleware/inputSanitization.js';
 
 const router = express.Router();
 
@@ -75,12 +76,8 @@ router.get('/users', protect, isAdmin, async (req, res) => {
     const skip = (page - 1) * limit;
     
     const search = req.query.search || '';
-    const filter = search ? {
-      $or: [
-        { name: { $regex: search, $options: 'i' } },
-        { email: { $regex: search, $options: 'i' } }
-      ]
-    } : {};
+    // Use safe regex filter to prevent injection
+    const filter = search ? buildSafeRegexFilter(search, ['name', 'email']) : {};
     
     const users = await User.find(filter)
       .select('-password')

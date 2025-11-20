@@ -22,16 +22,12 @@ services:
     restart: unless-stopped
     ports:
       - "5000:5000"
+    env_file:
+      - ./server/.env
     environment:
       - NODE_ENV=production
       - PORT=5000
       - MONGODB_URI=mongodb://mongodb:27017/munazzam
-      - JWT_SECRET=gpD7rS/U6lzCMt8Ot82619E2wW6ZU1JxM1NmqEbSFnw=
-      - DEEPSEEK_API_KEY=sk-4cf8a3948ce84902a87fa296198c7988
-      - OPENAI_API_KEY=sk-4cf8a3948ce84902a87fa296198c7988
-      - FRONTEND_URL=http://localhost:3000
-      - MAX_FILE_SIZE=104857600
-      - UPLOAD_DIR=./uploads
     depends_on:
       - mongodb
     volumes:

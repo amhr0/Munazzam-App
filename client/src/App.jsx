@@ -7,6 +7,7 @@ import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import Calendar from './pages/Calendar';
 import Meetings from './pages/Meetings';
+import Inbox from './pages/Inbox';
 import Pricing from './pages/Pricing';
 import Privacy from './pages/Privacy';
 import Terms from './pages/Terms';
@@ -46,6 +47,7 @@ function App() {
                     <Route path="dashboard" element={<Dashboard />} />
                     <Route path="calendar" element={<Calendar />} />
                     <Route path="meetings" element={<Meetings />} />
+                    <Route path="inbox" element={<Inbox />} />
                     <Route index element={<Navigate to="dashboard" replace />} />
                 </Route>
 
