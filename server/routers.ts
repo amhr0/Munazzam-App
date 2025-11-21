@@ -16,6 +16,8 @@ import {
   createJob
 } from "./db";
 import { ragService } from "./services/rag";
+import { generateDailyBriefing } from "./services/dailyBriefing";
+import { createBriefing, getBriefingByUserAndDate } from "./db";
 
 // Initialize RAG service on startup
 ragService.initialize().catch(console.error);
@@ -199,6 +201,45 @@ export const appRouter = router({
   knowledge: router({
     list: protectedProcedure.query(() => {
       return ragService.getKnowledgeBase();
+    }),
+  }),
+
+  briefing: router({
+    today: protectedProcedure.query(async ({ ctx }) => {
+      const today = new Date();
+      
+      // Check if briefing already exists for today
+      const existing = await getBriefingByUserAndDate(ctx.user.id, today);
+      if (existing) {
+        return JSON.parse(existing.content);
+      }
+
+      // Generate new briefing
+      const briefingData = await generateDailyBriefing(ctx.user.id);
+      
+      // Save to database
+      await createBriefing({
+        userId: ctx.user.id,
+        date: today,
+        content: JSON.stringify(briefingData)
+      });
+
+      return briefingData;
+    }),
+
+    refresh: protectedProcedure.mutation(async ({ ctx }) => {
+      // Generate fresh briefing
+      const briefingData = await generateDailyBriefing(ctx.user.id);
+      
+      // Save to database
+      const today = new Date();
+      await createBriefing({
+        userId: ctx.user.id,
+        date: today,
+        content: JSON.stringify(briefingData)
+      });
+
+      return briefingData;
     }),
   }),
 });

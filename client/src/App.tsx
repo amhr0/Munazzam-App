@@ -10,6 +10,7 @@ import Meetings from "./pages/Meetings";
 import MeetingDetail from "./pages/MeetingDetail";
 import Interviews from "./pages/Interviews";
 import Tasks from "./pages/Tasks";
+import DailyBriefing from "./pages/DailyBriefing";
 
 function Router() {
   return (
@@ -20,6 +21,7 @@ function Router() {
       <Route path={"/meetings/:id"} component={MeetingDetail} />
       <Route path={"/interviews"} component={Interviews} />
       <Route path={"/tasks"} component={Tasks} />
+      <Route path={"/briefing"} component={DailyBriefing} />
       <Route path={"/404"} component={NotFound} />
       <Route component={NotFound} />
     </Switch>

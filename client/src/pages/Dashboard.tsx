@@ -1,7 +1,7 @@
 import DashboardLayout from "@/components/DashboardLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { trpc } from "@/lib/trpc";
-import { FileText, Users, CheckSquare, TrendingUp, Clock, AlertCircle } from "lucide-react";
+import { FileText, Users, CheckSquare, TrendingUp, Clock, AlertCircle, Sun } from "lucide-react";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 
@@ -176,6 +176,27 @@ export default function Dashboard() {
             </CardContent>
           </Card>
         </div>
+
+        {/* Daily Briefing Card */}
+        <Card className="border-2 border-orange-200 bg-gradient-to-br from-orange-50 to-yellow-50">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Sun className="h-5 w-5 text-orange-600" />
+              المساعد الصباحي
+            </CardTitle>
+            <CardDescription>ملخص يومي ذكي لمهامك واجتماعاتك</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm text-muted-foreground mb-4">
+              احصل على ملخص تنفيذي يومي مع توصيات ذكية لتحسين إنتاجيتك
+            </p>
+            <Button className="w-full" variant="default" asChild>
+              <Link href="/briefing">
+                عرض الملخص الصباحي
+              </Link>
+            </Button>
+          </CardContent>
+        </Card>
 
         {/* Urgent Tasks */}
         {urgentTasks.length > 0 && (
