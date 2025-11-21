@@ -3,6 +3,8 @@ import { Server as HTTPServer } from "http";
 import { invokeLLM } from "../_core/llm";
 import { transcribeAudio } from "../_core/voiceTranscription";
 import { ragService } from "./rag";
+import { analyzeMeetingContext, generateTacticalSuggestions, type EmotionData, type MeetingContext } from "./tacticalSuggestions";
+import { registerEmotionHandler } from "./liveCopilot-emotion-handler";
 
 interface LiveSession {
   sessionId: string;
@@ -24,6 +26,16 @@ interface LiveSession {
     severity: 'low' | 'medium' | 'high';
     timestamp: number;
   }>;
+  tacticalSuggestions: Array<{
+    type: 'opportunity' | 'warning' | 'tactic' | 'question';
+    priority: 'critical' | 'high' | 'medium' | 'low';
+    message: string;
+    reasoning: string;
+    action?: string;
+    timestamp: number;
+  }>;
+  emotionData: EmotionData[];
+  meetingContext?: MeetingContext;
   startTime: number;
 }
 
@@ -46,6 +58,9 @@ export function initializeLiveCopilot(httpServer: HTTPServer) {
   copilotNamespace.on("connection", (socket) => {
     console.log(`[LiveCopilot] Client connected: ${socket.id}`);
 
+    // Register emotion data handler
+    registerEmotionHandler(socket, activeSessions);
+
     // Start new interview session
     socket.on("start-session", async (data: { 
       userId: number; 
@@ -62,6 +77,8 @@ export function initializeLiveCopilot(httpServer: HTTPServer) {
         transcript: [],
         suggestions: [],
         redFlags: [],
+        tacticalSuggestions: [],
+        emotionData: [],
         startTime: Date.now()
       };
 
