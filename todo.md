@@ -86,3 +86,19 @@
 - [x] واجهة الاقتراحات الفورية
 - [x] حفظ جلسة المقابلة المباشرة
 - [x] اختبار الميزة الكاملة
+
+
+## Chrome Extension لـ Google Meet و Zoom - جديد
+- [x] إنشاء manifest.json وبنية Extension
+- [x] بناء background service worker
+- [x] بناء content script لـ Google Meet
+- [x] بناء content script لـ Zoom
+- [x] التقاط الصوت والفيديو من Meet/Zoom
+- [x] بناء Sidebar جانبي لعرض الاقتراحات
+- [x] ربط Extension مع Socket.io (المساعد الخفي)
+- [x] حفظ الاجتماعات تلقائياً في منظم
+- [x] بناء واجهة إعدادات Extension
+- [x] بناء واجهة popup للتحكم السريع
+- [x] اختبار Extension مع Google Meet
+- [x] اختبار Extension مع Zoom
+- [x] إعداد ملفات النشر لـ Chrome Web Store

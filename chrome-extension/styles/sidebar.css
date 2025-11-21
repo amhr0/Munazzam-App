@@ -1,0 +1,367 @@
+/* Munazzam Sidebar Styles */
+
+#munazzam-sidebar {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 380px;
+  height: 100vh;
+  background: #ffffff;
+  box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
+  z-index: 999999;
+  display: flex;
+  flex-direction: column;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  direction: rtl;
+}
+
+.munazzam-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.munazzam-logo {
+  width: 32px;
+  height: 32px;
+}
+
+.munazzam-header h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  flex: 1;
+}
+
+.munazzam-close-btn {
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  color: white;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 24px;
+  line-height: 1;
+  transition: background 0.2s;
+}
+
+.munazzam-close-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.munazzam-status {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 20px;
+  background: #f8f9fa;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.munazzam-status-indicator {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #6c757d;
+}
+
+.munazzam-status-ready {
+  background: #28a745;
+  animation: pulse 2s infinite;
+}
+
+.munazzam-status-recording {
+  background: #dc3545;
+  animation: pulse 1s infinite;
+}
+
+.munazzam-status-connected {
+  background: #17a2b8;
+}
+
+.munazzam-status-error {
+  background: #ffc107;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+#munazzam-status-text {
+  font-size: 14px;
+  color: #495057;
+  font-weight: 500;
+}
+
+.munazzam-controls {
+  padding: 16px 20px;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.munazzam-btn {
+  width: 100%;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.munazzam-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.munazzam-btn-primary {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.munazzam-btn-primary:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.munazzam-btn-danger {
+  background: #dc3545;
+  color: white;
+}
+
+.munazzam-btn-danger:hover:not(:disabled) {
+  background: #c82333;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(220, 53, 69, 0.4);
+}
+
+.munazzam-icon {
+  font-size: 18px;
+}
+
+.munazzam-tabs {
+  display: flex;
+  border-bottom: 2px solid #e9ecef;
+  background: #f8f9fa;
+}
+
+.munazzam-tab {
+  flex: 1;
+  padding: 12px 16px;
+  border: none;
+  background: transparent;
+  font-size: 13px;
+  font-weight: 600;
+  color: #6c757d;
+  cursor: pointer;
+  transition: all 0.2s;
+  border-bottom: 3px solid transparent;
+}
+
+.munazzam-tab:hover {
+  background: rgba(102, 126, 234, 0.05);
+  color: #667eea;
+}
+
+.munazzam-tab.active {
+  color: #667eea;
+  border-bottom-color: #667eea;
+  background: white;
+}
+
+.munazzam-content {
+  flex: 1;
+  overflow-y: auto;
+  background: white;
+}
+
+.munazzam-tab-content {
+  display: none;
+  padding: 16px 20px;
+}
+
+.munazzam-tab-content.active {
+  display: block;
+}
+
+.munazzam-empty {
+  text-align: center;
+  padding: 40px 20px;
+  color: #6c757d;
+  font-size: 14px;
+}
+
+/* Transcript Styles */
+.munazzam-transcript-item {
+  margin-bottom: 16px;
+  padding: 12px;
+  border-radius: 8px;
+  background: #f8f9fa;
+}
+
+.munazzam-speaker-candidate {
+  background: #e7f3ff;
+  border-right: 3px solid #007bff;
+}
+
+.munazzam-speaker-interviewer {
+  background: #f0f8f0;
+  border-right: 3px solid #28a745;
+}
+
+.munazzam-transcript-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.munazzam-speaker-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.munazzam-timestamp {
+  font-size: 11px;
+  color: #6c757d;
+}
+
+.munazzam-transcript-text {
+  font-size: 14px;
+  line-height: 1.5;
+  color: #212529;
+}
+
+/* Suggestion Styles */
+.munazzam-suggestion-item {
+  display: flex;
+  gap: 12px;
+  padding: 12px;
+  margin-bottom: 12px;
+  border-radius: 8px;
+  background: #f8f9fa;
+  border-right: 3px solid #6c757d;
+}
+
+.munazzam-suggestion-question {
+  background: #fff3cd;
+  border-right-color: #ffc107;
+}
+
+.munazzam-suggestion-concern {
+  background: #f8d7da;
+  border-right-color: #dc3545;
+}
+
+.munazzam-suggestion-insight {
+  background: #d1ecf1;
+  border-right-color: #17a2b8;
+}
+
+.munazzam-suggestion-icon {
+  font-size: 20px;
+  line-height: 1;
+}
+
+.munazzam-suggestion-content {
+  flex: 1;
+}
+
+.munazzam-suggestion-type {
+  font-size: 11px;
+  font-weight: 600;
+  color: #6c757d;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+.munazzam-suggestion-text {
+  font-size: 14px;
+  line-height: 1.5;
+  color: #212529;
+}
+
+/* Red Flag Styles */
+.munazzam-flag-item {
+  display: flex;
+  gap: 12px;
+  padding: 12px;
+  margin-bottom: 12px;
+  border-radius: 8px;
+  background: #fff3cd;
+  border-right: 3px solid #ffc107;
+}
+
+.munazzam-flag-high {
+  background: #f8d7da;
+  border-right-color: #dc3545;
+}
+
+.munazzam-flag-medium {
+  background: #fff3cd;
+  border-right-color: #ffc107;
+}
+
+.munazzam-flag-low {
+  background: #d1ecf1;
+  border-right-color: #17a2b8;
+}
+
+.munazzam-flag-icon {
+  font-size: 20px;
+  line-height: 1;
+}
+
+.munazzam-flag-content {
+  flex: 1;
+}
+
+.munazzam-flag-severity {
+  font-size: 11px;
+  font-weight: 600;
+  color: #6c757d;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+.munazzam-flag-text {
+  font-size: 14px;
+  line-height: 1.5;
+  color: #212529;
+}
+
+/* Scrollbar Styling */
+.munazzam-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.munazzam-content::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+.munazzam-content::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 4px;
+}
+
+.munazzam-content::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}

@@ -1,0 +1,63 @@
+{
+  "manifest_version": 3,
+  "name": "منظم - المساعد الذكي للاجتماعات",
+  "version": "1.0.0",
+  "description": "مساعد ذكي يسجل ويحلل اجتماعات Google Meet و Zoom مع اقتراحات فورية",
+  "permissions": [
+    "activeTab",
+    "storage",
+    "tabs",
+    "scripting"
+  ],
+  "host_permissions": [
+    "https://meet.google.com/*",
+    "https://*.zoom.us/*",
+    "https://*.zoom.com/*"
+  ],
+  "background": {
+    "service_worker": "scripts/background.js",
+    "type": "module"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://meet.google.com/*"],
+      "js": ["scripts/meet-content.js"],
+      "css": ["styles/sidebar.css"],
+      "run_at": "document_end"
+    },
+    {
+      "matches": [
+        "https://*.zoom.us/*",
+        "https://*.zoom.com/*"
+      ],
+      "js": ["scripts/zoom-content.js"],
+      "css": ["styles/sidebar.css"],
+      "run_at": "document_end"
+    }
+  ],
+  "action": {
+    "default_popup": "popup/popup.html",
+    "default_icon": {
+      "16": "assets/icon-16.png",
+      "32": "assets/icon-32.png",
+      "48": "assets/icon-48.png",
+      "128": "assets/icon-128.png"
+    }
+  },
+  "icons": {
+    "16": "assets/icon-16.png",
+    "32": "assets/icon-32.png",
+    "48": "assets/icon-48.png",
+    "128": "assets/icon-128.png"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": ["scripts/socket.io.min.js", "styles/*"],
+      "matches": [
+        "https://meet.google.com/*",
+        "https://*.zoom.us/*",
+        "https://*.zoom.com/*"
+      ]
+    }
+  ]
+}
