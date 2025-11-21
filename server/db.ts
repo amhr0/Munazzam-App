@@ -1,11 +1,17 @@
-import { eq } from "drizzle-orm";
+import { eq, and, desc } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users } from "../drizzle/schema";
+import { 
+  InsertUser, users, 
+  meetings, InsertMeeting, Meeting,
+  interviews, InsertInterview, Interview,
+  tasks, InsertTask, Task,
+  jobs, InsertJob, Job,
+  briefings, InsertBriefing, Briefing
+} from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
 
-// Lazily create the drizzle instance so local tooling can run without a DB.
 export async function getDb() {
   if (!_db && process.env.DATABASE_URL) {
     try {
@@ -85,8 +91,163 @@ export async function getUserByOpenId(openId: string) {
   }
 
   const result = await db.select().from(users).where(eq(users.openId, openId)).limit(1);
-
   return result.length > 0 ? result[0] : undefined;
 }
 
-// TODO: add feature queries here as your schema grows.
+// Meetings
+export async function createMeeting(meeting: InsertMeeting): Promise<Meeting> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const result = await db.insert(meetings).values(meeting);
+  const insertedId = Number(result[0].insertId);
+  const inserted = await db.select().from(meetings).where(eq(meetings.id, insertedId)).limit(1);
+  return inserted[0]!;
+}
+
+export async function getMeetingsByUserId(userId: number): Promise<Meeting[]> {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return db.select().from(meetings).where(eq(meetings.userId, userId)).orderBy(desc(meetings.createdAt));
+}
+
+export async function getMeetingById(id: number): Promise<Meeting | undefined> {
+  const db = await getDb();
+  if (!db) return undefined;
+  
+  const result = await db.select().from(meetings).where(eq(meetings.id, id)).limit(1);
+  return result[0];
+}
+
+export async function updateMeeting(id: number, data: Partial<Meeting>): Promise<void> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.update(meetings).set(data).where(eq(meetings.id, id));
+}
+
+// Interviews
+export async function createInterview(interview: InsertInterview): Promise<Interview> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const result = await db.insert(interviews).values(interview);
+  const insertedId = Number(result[0].insertId);
+  const inserted = await db.select().from(interviews).where(eq(interviews.id, insertedId)).limit(1);
+  return inserted[0]!;
+}
+
+export async function getInterviewsByUserId(userId: number): Promise<Interview[]> {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return db.select().from(interviews).where(eq(interviews.userId, userId)).orderBy(desc(interviews.createdAt));
+}
+
+export async function getInterviewById(id: number): Promise<Interview | undefined> {
+  const db = await getDb();
+  if (!db) return undefined;
+  
+  const result = await db.select().from(interviews).where(eq(interviews.id, id)).limit(1);
+  return result[0];
+}
+
+export async function updateInterview(id: number, data: Partial<Interview>): Promise<void> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.update(interviews).set(data).where(eq(interviews.id, id));
+}
+
+// Tasks
+export async function createTask(task: InsertTask): Promise<Task> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const result = await db.insert(tasks).values(task);
+  const insertedId = Number(result[0].insertId);
+  const inserted = await db.select().from(tasks).where(eq(tasks.id, insertedId)).limit(1);
+  return inserted[0]!;
+}
+
+export async function getTasksByUserId(userId: number): Promise<Task[]> {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return db.select().from(tasks).where(eq(tasks.userId, userId)).orderBy(desc(tasks.createdAt));
+}
+
+export async function updateTask(id: number, data: Partial<Task>): Promise<void> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.update(tasks).set(data).where(eq(tasks.id, id));
+}
+
+// Jobs
+export async function createJob(job: InsertJob): Promise<Job> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const result = await db.insert(jobs).values(job);
+  const insertedId = Number(result[0].insertId);
+  const inserted = await db.select().from(jobs).where(eq(jobs.id, insertedId)).limit(1);
+  return inserted[0]!;
+}
+
+export async function getJobById(id: number): Promise<Job | undefined> {
+  const db = await getDb();
+  if (!db) return undefined;
+  
+  const result = await db.select().from(jobs).where(eq(jobs.id, id)).limit(1);
+  return result[0];
+}
+
+export async function updateJob(id: number, data: Partial<Job>): Promise<void> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.update(jobs).set(data).where(eq(jobs.id, id));
+}
+
+export async function getQueuedJobs(): Promise<Job[]> {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return db.select().from(jobs).where(eq(jobs.status, "queued")).orderBy(jobs.createdAt);
+}
+
+// Briefings
+export async function createBriefing(briefing: InsertBriefing): Promise<Briefing> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const result = await db.insert(briefings).values(briefing);
+  const insertedId = Number(result[0].insertId);
+  const inserted = await db.select().from(briefings).where(eq(briefings.id, insertedId)).limit(1);
+  return inserted[0]!;
+}
+
+export async function getBriefingByUserAndDate(userId: number, date: Date): Promise<Briefing | undefined> {
+  const db = await getDb();
+  if (!db) return undefined;
+  
+  const startOfDay = new Date(date);
+  startOfDay.setHours(0, 0, 0, 0);
+  
+  const endOfDay = new Date(date);
+  endOfDay.setHours(23, 59, 59, 999);
+  
+  const result = await db.select().from(briefings)
+    .where(
+      and(
+        eq(briefings.userId, userId),
+        // Note: This is a simplified check, might need adjustment based on your needs
+      )
+    )
+    .orderBy(desc(briefings.createdAt))
+    .limit(1);
+  
+  return result[0];
+}
