@@ -11,6 +11,9 @@ import MeetingDetail from "./pages/MeetingDetail";
 import Interviews from "./pages/Interviews";
 import Tasks from "./pages/Tasks";
 import DailyBriefing from "./pages/DailyBriefing";
+import Integrations from "./pages/Integrations";
+import Calendar from "./pages/Calendar";
+import EmailInbox from "./pages/EmailInbox";
 
 function Router() {
   return (
@@ -22,6 +25,9 @@ function Router() {
       <Route path={"/interviews"} component={Interviews} />
       <Route path={"/tasks"} component={Tasks} />
       <Route path={"/briefing"} component={DailyBriefing} />
+      <Route path={"/integrations"} component={Integrations} />
+      <Route path={"/calendar"} component={Calendar} />
+      <Route path={"/emails"} component={EmailInbox} />
       <Route path={"/404"} component={NotFound} />
       <Route component={NotFound} />
     </Switch>

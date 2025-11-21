@@ -112,3 +112,66 @@ export type Job = typeof jobs.$inferSelect;
 export type InsertJob = typeof jobs.$inferInsert;
 export type Briefing = typeof briefings.$inferSelect;
 export type InsertBriefing = typeof briefings.$inferInsert;
+
+/**
+ * External integrations (Google, Microsoft)
+ */
+export const integrations = mysqlTable("integrations", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(),
+  provider: mysqlEnum("provider", ["google", "microsoft"]).notNull(),
+  accessToken: text("accessToken").notNull(),
+  refreshToken: text("refreshToken"),
+  expiresAt: timestamp("expiresAt"),
+  scope: text("scope"),
+  email: varchar("email", { length: 320 }),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type Integration = typeof integrations.$inferSelect;
+export type InsertIntegration = typeof integrations.$inferInsert;
+
+/**
+ * Calendar events synced from external calendars
+ */
+export const calendarEvents = mysqlTable("calendar_events", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(),
+  integrationId: int("integrationId").notNull(),
+  externalId: varchar("externalId", { length: 255 }).notNull(),
+  title: text("title").notNull(),
+  description: text("description"),
+  startTime: timestamp("startTime").notNull(),
+  endTime: timestamp("endTime").notNull(),
+  location: text("location"),
+  attendees: text("attendees"),
+  status: mysqlEnum("status", ["confirmed", "tentative", "cancelled"]).default("confirmed").notNull(),
+  meetingUrl: text("meetingUrl"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type CalendarEvent = typeof calendarEvents.$inferSelect;
+export type InsertCalendarEvent = typeof calendarEvents.$inferInsert;
+
+/**
+ * Emails analyzed for tasks and insights
+ */
+export const emails = mysqlTable("emails", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(),
+  integrationId: int("integrationId").notNull(),
+  externalId: varchar("externalId", { length: 255 }).notNull(),
+  subject: text("subject").notNull(),
+  from: varchar("from", { length: 320 }).notNull(),
+  to: text("to"),
+  body: text("body"),
+  receivedAt: timestamp("receivedAt").notNull(),
+  analyzed: int("analyzed").default(0).notNull(),
+  extractedTasks: text("extractedTasks"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type Email = typeof emails.$inferSelect;
+export type InsertEmail = typeof emails.$inferInsert;

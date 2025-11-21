@@ -242,6 +242,90 @@ export const appRouter = router({
       return briefingData;
     }),
   }),
+
+  integrations: router({
+    list: protectedProcedure.query(async ({ ctx }) => {
+      const { getIntegrationsByUserId } = await import("./db-integrations");
+      return getIntegrationsByUserId(ctx.user.id);
+    }),
+    
+    getAuthUrl: protectedProcedure
+      .input(z.object({ provider: z.enum(["google", "microsoft"]) }))
+      .query(async ({ input, ctx }) => {
+        const { getGoogleAuthUrl, getMicrosoftAuthUrl } = await import("./services/oauth");
+        const state = `${ctx.user.id}:${Date.now()}`;
+        
+        if (input.provider === "google") {
+          return { url: getGoogleAuthUrl(state) };
+        } else {
+          return { url: getMicrosoftAuthUrl(state) };
+        }
+      }),
+    
+    disconnect: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ input }) => {
+        const { deleteIntegration, deleteCalendarEventsByIntegrationId, deleteEmailsByIntegrationId } = await import("./db-integrations");
+        
+        await deleteCalendarEventsByIntegrationId(input.id);
+        await deleteEmailsByIntegrationId(input.id);
+        await deleteIntegration(input.id);
+        
+        return { success: true };
+      }),
+    
+    syncCalendar: protectedProcedure
+      .input(z.object({ integrationId: z.number() }))
+      .mutation(async ({ input, ctx }) => {
+        const { syncCalendar } = await import("./services/calendarSync");
+        const count = await syncCalendar(input.integrationId, ctx.user.id);
+        return { success: true, syncedCount: count };
+      }),
+    
+    syncEmail: protectedProcedure
+      .input(z.object({ integrationId: z.number() }))
+      .mutation(async ({ input, ctx }) => {
+        const { getIntegrationById } = await import("./db-integrations");
+        const integration = await getIntegrationById(input.integrationId);
+        
+        if (!integration) {
+          throw new Error("Integration not found");
+        }
+        
+        let count = 0;
+        if (integration.provider === "google") {
+          const { syncGmail } = await import("./services/emailAnalysis");
+          count = await syncGmail(input.integrationId, ctx.user.id);
+        } else {
+          const { syncOutlookEmail } = await import("./services/emailAnalysis");
+          count = await syncOutlookEmail(input.integrationId, ctx.user.id);
+        }
+        
+        return { success: true, syncedCount: count };
+      }),
+    
+    analyzeEmails: protectedProcedure.mutation(async ({ ctx }) => {
+      const { analyzeAllUnanalyzedEmails } = await import("./services/emailAnalysis");
+      const count = await analyzeAllUnanalyzedEmails(ctx.user.id);
+      return { success: true, analyzedCount: count };
+    }),
+  }),
+
+  calendar: router({
+    list: protectedProcedure.query(async ({ ctx }) => {
+      const { getCalendarEventsByUserId } = await import("./db-integrations");
+      return getCalendarEventsByUserId(ctx.user.id);
+    }),
+  }),
+
+  emails: router({
+    list: protectedProcedure
+      .input(z.object({ limit: z.number().optional() }).optional())
+      .query(async ({ input, ctx }) => {
+        const { getEmailsByUserId } = await import("./db-integrations");
+        return getEmailsByUserId(ctx.user.id, input?.limit);
+      }),
+  }),
 });
 
 export type AppRouter = typeof appRouter;

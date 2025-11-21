@@ -35,6 +35,19 @@
 - **تحليل مبني** على أفضل الممارسات العالمية
 - **توصيات ذكية** مستمدة من خبرات إدارية موثوقة
 
+### 5. المساعد الصباحي (Daily Briefing)
+- **ملخص يومي ذكي** للمهام والاجتماعات
+- **إحصائيات الإنجاز** (معدل الإكمال، المهام العاجلة)
+- **توصيات يومية** مخصصة بناءً على نشاطك
+- **عرض النشاط الأخير** (اجتماعات، مقابلات، مهام)
+
+### 6. التكامل مع الخدمات الخارجية
+- **Google Calendar**: مزامنة الاجتماعات من تقويم Google
+- **Gmail**: تحليل الإيميلات واستخراج المهام تلقائيًا
+- **Outlook Calendar**: مزامنة الاجتماعات من Outlook
+- **Outlook Email**: تحليل إيميلات Outlook واستخراج المهام
+- **استخراج المهام بالذكاء الاصطناعي**: تحليل الإيميلات وتحديد الإجراءات المطلوبة
+
 ## التقنيات المستخدمة
 
 ### Backend
@@ -104,6 +117,24 @@ pnpm db:push
 pnpm dev
 ```
 
+### إعداد OAuth (اختياري)
+
+لتفعيل التكامل مع Google و Microsoft:
+
+1. اتبع التعليمات في `OAUTH_SETUP.md`
+2. أضف بيانات الاعتماد إلى متغيرات البيئة:
+   ```bash
+   GOOGLE_CLIENT_ID=your_client_id
+   GOOGLE_CLIENT_SECRET=your_client_secret
+   GOOGLE_REDIRECT_URI=https://your-domain.com/api/oauth/google/callback
+   
+   MICROSOFT_CLIENT_ID=your_client_id
+   MICROSOFT_CLIENT_SECRET=your_client_secret
+   MICROSOFT_REDIRECT_URI=https://your-domain.com/api/oauth/microsoft/callback
+   ```
+
+⚠️ **ملاحظة**: التكامل مع Google/Microsoft اختياري. يمكن استخدام النظام بدونه.
+
 ### النشر على VPS
 راجع ملف [DEPLOYMENT.md](./DEPLOYMENT.md) للتعليمات الكاملة.
 
@@ -142,6 +173,9 @@ munazzam/
 - **tasks** - المهام المستخرجة
 - **jobs** - طابور المعالجة الخلفية
 - **briefings** - الملخصات اليومية
+- **integrations** - تكاملات Google/Microsoft
+- **calendar_events** - أحداث التقويم المزامنة
+- **emails** - الإيميلات المزامنة والمحللة
 
 ## API Documentation
 

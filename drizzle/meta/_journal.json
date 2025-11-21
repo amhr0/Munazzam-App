@@ -15,6 +15,13 @@
       "when": 1763737578886,
       "tag": "0001_chubby_deathstrike",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1763738935991,
+      "tag": "0002_polite_lady_bullseye",
+      "breakpoints": true
     }
   ]
 }

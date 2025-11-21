@@ -1,7 +1,7 @@
 import DashboardLayout from "@/components/DashboardLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { trpc } from "@/lib/trpc";
-import { FileText, Users, CheckSquare, TrendingUp, Clock, AlertCircle, Sun } from "lucide-react";
+import { FileText, Users, CheckSquare, TrendingUp, Clock, AlertCircle, Sun, Calendar as CalendarIcon, Mail, Settings } from "lucide-react";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 
@@ -175,6 +175,60 @@ export default function Dashboard() {
               )}
             </CardContent>
           </Card>
+        </div>
+
+        {/* Integration Cards */}
+        <div className="grid gap-4 md:grid-cols-3">
+          <Link href="/calendar">
+            <Card className="hover:shadow-lg transition-shadow cursor-pointer h-full">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <CalendarIcon className="h-5 w-5 text-blue-600" />
+                  التقويم
+                </CardTitle>
+                <CardDescription>الأحداث المزامنة</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground">
+                  عرض الاجتماعات من Google و Outlook
+                </p>
+              </CardContent>
+            </Card>
+          </Link>
+
+          <Link href="/emails">
+            <Card className="hover:shadow-lg transition-shadow cursor-pointer h-full">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Mail className="h-5 w-5 text-green-600" />
+                  الإيميلات
+                </CardTitle>
+                <CardDescription>المهام المستخرجة</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground">
+                  تحليل الإيميلات واستخراج المهام
+                </p>
+              </CardContent>
+            </Card>
+          </Link>
+
+          <Link href="/integrations">
+            <Card className="hover:shadow-lg transition-shadow cursor-pointer h-full border-2 border-primary/20">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Settings className="h-5 w-5 text-purple-600" />
+                  التكاملات
+                </CardTitle>
+                <CardDescription>ربط الحسابات</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground">
+                  إعداد Google و Microsoft
+                </p>
+              </CardContent>
+            </Card>
+          </Link>
         </div>
 
         {/* Daily Briefing Card */}
