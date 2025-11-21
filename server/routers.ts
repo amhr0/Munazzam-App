@@ -18,6 +18,7 @@ import {
 import { ragService } from "./services/rag";
 import { generateDailyBriefing } from "./services/dailyBriefing";
 import { createBriefing, getBriefingByUserAndDate } from "./db";
+import { getEmotionAnalysis, getEmotionSummary } from "./db-emotions";
 
 // Initialize RAG service on startup
 ragService.initialize().catch(console.error);
@@ -324,6 +325,43 @@ export const appRouter = router({
       .query(async ({ input, ctx }) => {
         const { getEmailsByUserId } = await import("./db-integrations");
         return getEmailsByUserId(ctx.user.id, input?.limit);
+      }),
+  }),
+
+  emotions: router({
+    getAnalysis: protectedProcedure
+      .input(z.object({
+        entityType: z.enum(["meeting", "interview"]),
+        entityId: z.number(),
+      }))
+      .query(async ({ input }) => {
+        return await getEmotionAnalysis(input.entityType, input.entityId);
+      }),
+    
+    getSummary: protectedProcedure
+      .input(z.object({
+        entityType: z.enum(["meeting", "interview"]),
+        entityId: z.number(),
+      }))
+      .query(async ({ input }) => {
+        return await getEmotionSummary(input.entityType, input.entityId);
+      }),
+    
+    startAnalysis: protectedProcedure
+      .input(z.object({
+        entityType: z.enum(["meeting", "interview"]),
+        entityId: z.number(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        // Create emotion analysis job
+        const jobId = await createJob({
+          userId: ctx.user.id,
+          type: "emotion_analysis",
+          entityType: input.entityType,
+          entityId: input.entityId,
+        });
+        
+        return { success: true, jobId };
       }),
   }),
 });

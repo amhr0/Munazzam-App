@@ -102,3 +102,18 @@
 - [x] اختبار Extension مع Google Meet
 - [x] اختبار Extension مع Zoom
 - [x] إعداد ملفات النشر لـ Chrome Web Store
+
+
+## تحليل تعابير الوجه والمشاعر (Computer Vision) - جديد
+- [x] تثبيت مكتبات Computer Vision (OpenCV, face-api.js)
+- [x] بناء خدمة استخراج إطارات الفيديو
+- [x] بناء خدمة كشف الوجوه (Face Detection)
+- [x] بناء خدمة تحليل المشاعر (Emotion Recognition)
+- [x] بناء خدمة قياس الانتباه (Attention Detection)
+- [x] بناء خدمة تحليل لغة الجسد
+- [x] إضافة جدول emotion_analysis في قاعدة البيانات
+- [x] ربط التحليل مع Background Worker
+- [x] بناء واجهة عرض تحليل المشاعر
+- [x] بناء رسوم بيانية للمشاعر عبر الوقت
+- [x] إضافة تنبيهات للعلامات السلبية
+- [x] اختبار التحليل الكامل

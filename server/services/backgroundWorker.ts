@@ -1,6 +1,8 @@
 import { transcribeAudio } from "../_core/voiceTranscription";
 import { analyzeMeeting } from "./meetingAnalysis";
 import { analyzeInterview } from "./interviewAnalysis";
+import { analyzeVideoEmotions } from "./emotionAnalysis";
+import { saveEmotionFrames } from "../db-emotions";
 import { 
   getQueuedJobs, 
   updateJob, 
@@ -111,6 +113,8 @@ async function processJob(
     await processMeetingAnalysis(jobId, entityId);
   } else if (type === 'interview_analysis') {
     await processInterviewAnalysis(jobId, entityId);
+  } else if (type === 'emotion_analysis') {
+    await processEmotionAnalysis(jobId, entityType, entityId);
   }
 }
 
@@ -290,6 +294,89 @@ async function processInterviewAnalysis(jobId: number, interviewId: number) {
 
     console.log(`[BackgroundWorker] Interview analysis completed for interview ${interviewId}`);
   } catch (error) {
+    throw error;
+  }
+}
+
+
+/**
+ * Process emotion analysis job
+ */
+async function processEmotionAnalysis(
+  jobId: number,
+  entityType: string,
+  entityId: number
+) {
+  try {
+    let fileUrl: string | null = null;
+
+    if (entityType === 'meeting') {
+      const meeting = await getMeetingById(entityId);
+      if (!meeting || !meeting.fileUrl) {
+        throw new Error('Meeting or file not found');
+      }
+      fileUrl = meeting.fileUrl;
+    } else if (entityType === 'interview') {
+      const interview = await getInterviewById(entityId);
+      if (!interview || !interview.fileUrl) {
+        throw new Error('Interview or file not found');
+      }
+      fileUrl = interview.fileUrl;
+    }
+
+    if (!fileUrl) {
+      throw new Error('File URL not found');
+    }
+
+    // Update progress
+    await updateJob(jobId, { progress: 30 });
+
+    // TODO: Download video file from S3 to local temp file
+    // For now, assume fileUrl is a local path
+    console.log(`[BackgroundWorker] Analyzing emotions for ${entityType} ${entityId}`);
+
+    // Analyze video emotions
+    const result = await analyzeVideoEmotions(fileUrl, 2000); // Sample every 2 seconds
+
+    // Update progress
+    await updateJob(jobId, { progress: 80 });
+
+    // Save emotion frames to database
+    const frames = result.frames.map(frame => ({
+      userId: 1, // TODO: Get from job
+      entityType: entityType as 'meeting' | 'interview',
+      entityId,
+      timestamp: frame.timestamp,
+      happy: frame.emotions.happy,
+      sad: frame.emotions.sad,
+      angry: frame.emotions.angry,
+      surprised: frame.emotions.surprised,
+      fearful: frame.emotions.fearful,
+      disgusted: frame.emotions.disgusted,
+      neutral: frame.emotions.neutral,
+      dominantEmotion: frame.dominantEmotion,
+      attentionScore: frame.attentionScore,
+      eyeContact: frame.eyeContact,
+      headPose: frame.headPose,
+      bodyLanguage: JSON.stringify(frame.bodyLanguage),
+      engagement: frame.engagement,
+      confidence: frame.confidence,
+      stress: frame.stress,
+    }));
+
+    await saveEmotionFrames(frames);
+
+    // Update job as completed
+    await updateJob(jobId, {
+      status: 'completed',
+      progress: 100,
+      result: JSON.stringify(result.summary),
+      completedAt: new Date()
+    });
+
+    console.log(`[BackgroundWorker] Emotion analysis completed for ${entityType} ${entityId}`);
+  } catch (error) {
+    console.error(`[BackgroundWorker] Error in emotion analysis:`, error);
     throw error;
   }
 }

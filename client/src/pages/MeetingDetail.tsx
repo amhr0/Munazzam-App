@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { trpc } from "@/lib/trpc";
+import { EmotionAnalysis } from "@/components/EmotionAnalysis";
 import { ArrowRight, CheckCircle, Clock, AlertTriangle, FileText, Loader2, ChevronRight } from "lucide-react";
 import { useRoute } from "wouter";
 import { Link } from "wouter";
@@ -256,6 +257,11 @@ export default function MeetingDetail() {
               </Card>
             )}
           </>
+        )}
+
+        {/* Emotion Analysis */}
+        {meeting.status === 'completed' && (
+          <EmotionAnalysis entityType="meeting" entityId={meeting.id} />
         )}
 
         {/* No Analysis Yet */}

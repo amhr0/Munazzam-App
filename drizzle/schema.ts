@@ -77,7 +77,7 @@ export const tasks = mysqlTable("tasks", {
 export const jobs = mysqlTable("jobs", {
   id: int("id").autoincrement().primaryKey(),
   userId: int("userId").notNull(),
-  type: mysqlEnum("type", ["transcription", "meeting_analysis", "interview_analysis", "email_analysis"]).notNull(),
+  type: mysqlEnum("type", ["transcription", "meeting_analysis", "interview_analysis", "email_analysis", "emotion_analysis"]).notNull(),
   entityType: mysqlEnum("entityType", ["meeting", "interview", "email"]).notNull(),
   entityId: int("entityId").notNull(),
   status: mysqlEnum("status", ["queued", "processing", "completed", "failed"]).default("queued").notNull(),
@@ -175,3 +175,44 @@ export const emails = mysqlTable("emails", {
 
 export type Email = typeof emails.$inferSelect;
 export type InsertEmail = typeof emails.$inferInsert;
+
+/**
+ * Emotion Analysis - تحليل تعابير الوجه والمشاعر
+ */
+export const emotionAnalysis = mysqlTable("emotion_analysis", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(),
+  entityType: mysqlEnum("entityType", ["meeting", "interview"]).notNull(),
+  entityId: int("entityId").notNull(),
+  timestamp: int("timestamp").notNull(), // Timestamp in video (milliseconds)
+  
+  // Detected emotions (0-100 confidence)
+  happy: int("happy").default(0),
+  sad: int("sad").default(0),
+  angry: int("angry").default(0),
+  surprised: int("surprised").default(0),
+  fearful: int("fearful").default(0),
+  disgusted: int("disgusted").default(0),
+  neutral: int("neutral").default(0),
+  
+  // Dominant emotion
+  dominantEmotion: varchar("dominantEmotion", { length: 50 }),
+  
+  // Attention metrics
+  attentionScore: int("attentionScore").default(0), // 0-100
+  eyeContact: boolean("eyeContact").default(false),
+  headPose: varchar("headPose", { length: 50 }), // "forward", "left", "right", "down", "up"
+  
+  // Body language
+  bodyLanguage: text("bodyLanguage"), // JSON: {posture, gestures, etc}
+  
+  // Overall assessment
+  engagement: int("engagement").default(0), // 0-100
+  confidence: int("confidence").default(0), // 0-100
+  stress: int("stress").default(0), // 0-100
+  
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type EmotionAnalysis = typeof emotionAnalysis.$inferSelect;
+export type InsertEmotionAnalysis = typeof emotionAnalysis.$inferInsert;

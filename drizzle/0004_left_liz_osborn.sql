@@ -1,0 +1,1 @@
+ALTER TABLE `jobs` MODIFY COLUMN `type` enum('transcription','meeting_analysis','interview_analysis','email_analysis','emotion_analysis') NOT NULL;
