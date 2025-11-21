@@ -8,6 +8,7 @@ import { appRouter } from "../routers";
 import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
 import { startBackgroundWorker } from "../services/backgroundWorker";
+import { initializeLiveCopilot } from "../services/liveCopilot";
 
 function isPortAvailable(port: number): Promise<boolean> {
   return new Promise(resolve => {
@@ -57,6 +58,10 @@ async function startServer() {
   if (port !== preferredPort) {
     console.log(`Port ${preferredPort} is busy, using port ${port} instead`);
   }
+
+  // Initialize Socket.io for live copilot
+  initializeLiveCopilot(server);
+  console.log(`✅ Socket.io initialized for live copilot`);
 
   server.listen(port, () => {
     console.log(`Server running on http://localhost:${port}/`);

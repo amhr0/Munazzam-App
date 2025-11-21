@@ -13,7 +13,8 @@ import Tasks from "./pages/Tasks";
 import DailyBriefing from "./pages/DailyBriefing";
 import Integrations from "./pages/Integrations";
 import Calendar from "./pages/Calendar";
-import EmailInbox from "./pages/EmailInbox";
+import EmailInbox from "@/pages/EmailInbox";
+import LiveInterview from "@/pages/LiveInterview";
 
 function Router() {
   return (
@@ -27,7 +28,8 @@ function Router() {
       <Route path={"/briefing"} component={DailyBriefing} />
       <Route path={"/integrations"} component={Integrations} />
       <Route path={"/calendar"} component={Calendar} />
-      <Route path={"/emails"} component={EmailInbox} />
+      <Route path={"/email-inbox"} component={EmailInbox} />
+      <Route path={"/live-interview"} component={LiveInterview} />
       <Route path={"/404"} component={NotFound} />
       <Route component={NotFound} />
     </Switch>

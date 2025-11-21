@@ -1,7 +1,7 @@
 import DashboardLayout from "@/components/DashboardLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { trpc } from "@/lib/trpc";
-import { FileText, Users, CheckSquare, TrendingUp, Clock, AlertCircle, Sun, Calendar as CalendarIcon, Mail, Settings } from "lucide-react";
+import { FileText, Users, CheckSquare, TrendingUp, Clock, AlertCircle, Sun, Calendar as CalendarIcon, Mail, Settings, Headphones } from "lucide-react";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 
@@ -231,26 +231,50 @@ export default function Dashboard() {
           </Link>
         </div>
 
-        {/* Daily Briefing Card */}
-        <Card className="border-2 border-orange-200 bg-gradient-to-br from-orange-50 to-yellow-50">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Sun className="h-5 w-5 text-orange-600" />
-              المساعد الصباحي
-            </CardTitle>
-            <CardDescription>ملخص يومي ذكي لمهامك واجتماعاتك</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <p className="text-sm text-muted-foreground mb-4">
-              احصل على ملخص تنفيذي يومي مع توصيات ذكية لتحسين إنتاجيتك
-            </p>
-            <Button className="w-full" variant="default" asChild>
-              <Link href="/briefing">
-                عرض الملخص الصباحي
-              </Link>
-            </Button>
-          </CardContent>
-        </Card>
+        {/* Feature Cards */}
+        <div className="grid gap-4 md:grid-cols-2">
+          {/* Daily Briefing Card */}
+          <Card className="border-2 border-orange-200 bg-gradient-to-br from-orange-50 to-yellow-50">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Sun className="h-5 w-5 text-orange-600" />
+                المساعد الصباحي
+              </CardTitle>
+              <CardDescription>ملخص يومي ذكي لمهامك واجتماعاتك</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-muted-foreground mb-4">
+                احصل على ملخص تنفيذي يومي مع توصيات ذكية لتحسين إنتاجيتك
+              </p>
+              <Button className="w-full" variant="default" asChild>
+                <Link href="/briefing">
+                  عرض الملخص الصباحي
+                </Link>
+              </Button>
+            </CardContent>
+          </Card>
+
+          {/* Live Interview Copilot Card */}
+          <Card className="border-2 border-purple-200 bg-gradient-to-br from-purple-50 to-pink-50">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Headphones className="h-5 w-5 text-purple-600" />
+                المساعد الخفي
+              </CardTitle>
+              <CardDescription>مساعد ذكي للمقابلات المباشرة</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-muted-foreground mb-4">
+                احصل على اقتراحات فورية أثناء إجراء المقابلة مع كشف العلامات الحمراء
+              </p>
+              <Button className="w-full" variant="default" asChild>
+                <Link href="/live-interview">
+                  بدء مقابلة مباشرة
+                </Link>
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
 
         {/* Urgent Tasks */}
         {urgentTasks.length > 0 && (
