@@ -3,6 +3,9 @@ import { COOKIE_NAME } from "@shared/const";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
 import { protectedProcedure, publicProcedure, router } from "./_core/trpc";
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
+import { ENV } from "./_core/env";
 import { storagePut } from "./storage";
 import { 
   createMeeting, 
@@ -13,8 +16,11 @@ import {
   getInterviewById,
   getTasksByUserId,
   updateTask,
-  createJob
+  createJob,
+  getDb
 } from "./db";
+import { users } from "../drizzle/schema";
+import { eq } from "drizzle-orm";
 import { ragService } from "./services/rag";
 import { generateDailyBriefing } from "./services/dailyBriefing";
 import { createBriefing, getBriefingByUserAndDate } from "./db";
@@ -28,6 +34,120 @@ export const appRouter = router({
   
   auth: router({
     me: publicProcedure.query(opts => opts.ctx.user),
+    
+    // Register new user
+    register: publicProcedure
+      .input(z.object({
+        email: z.string().email(),
+        password: z.string().min(6),
+        name: z.string().optional(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        const { email, password, name } = input;
+        
+        // Check if user exists
+        const db = await getDb();
+        if (!db) throw new Error("Database not available");
+        
+        const existing = await db.select().from(users).where(eq(users.email, email)).limit(1);
+        if (existing.length > 0) {
+          throw new Error("Email already registered");
+        }
+        
+        // Hash password
+        const hashedPassword = await bcrypt.hash(password, 10);
+        
+        // Create user
+        const openId = `local_${Date.now()}_${Math.random().toString(36)}`;
+        await db.insert(users).values({
+          openId,
+          email,
+          password: hashedPassword,
+          name: name || email.split('@')[0],
+          loginMethod: 'local',
+          role: 'user',
+        });
+        
+        // Get created user
+        const [user] = await db.select().from(users).where(eq(users.openId, openId)).limit(1);
+        
+        // Create JWT token
+        const token = jwt.sign(
+          { userId: user.id, email: user.email },
+          ENV.jwtSecret,
+          { expiresIn: '7d' }
+        );
+        
+        // Set cookie
+        const cookieOptions = getSessionCookieOptions(ctx.req);
+        ctx.res.cookie(COOKIE_NAME, token, {
+          ...cookieOptions,
+          maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+        });
+        
+        return {
+          success: true,
+          user: {
+            id: user.id,
+            email: user.email,
+            name: user.name,
+          },
+        };
+      }),
+    
+    // Login
+    login: publicProcedure
+      .input(z.object({
+        email: z.string().email(),
+        password: z.string(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        const { email, password } = input;
+        
+        const db = await getDb();
+        if (!db) throw new Error("Database not available");
+        
+        // Find user
+        const [user] = await db.select().from(users).where(eq(users.email, email)).limit(1);
+        if (!user || !user.password) {
+          throw new Error("Invalid email or password");
+        }
+        
+        // Verify password
+        const valid = await bcrypt.compare(password, user.password);
+        if (!valid) {
+          throw new Error("Invalid email or password");
+        }
+        
+        // Update last signed in
+        await db.update(users)
+          .set({ lastSignedIn: new Date() })
+          .where(eq(users.id, user.id));
+        
+        // Create JWT token
+        const token = jwt.sign(
+          { userId: user.id, email: user.email },
+          ENV.jwtSecret,
+          { expiresIn: '7d' }
+        );
+        
+        // Set cookie
+        const cookieOptions = getSessionCookieOptions(ctx.req);
+        ctx.res.cookie(COOKIE_NAME, token, {
+          ...cookieOptions,
+          maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+        });
+        
+        return {
+          success: true,
+          user: {
+            id: user.id,
+            email: user.email,
+            name: user.name,
+          },
+        };
+      }),
+    
     logout: publicProcedure.mutation(({ ctx }) => {
       const cookieOptions = getSessionCookieOptions(ctx.req);
       ctx.res.clearCookie(COOKIE_NAME, { ...cookieOptions, maxAge: -1 });

@@ -15,11 +15,13 @@ import Integrations from "./pages/Integrations";
 import Calendar from "./pages/Calendar";
 import EmailInbox from "@/pages/EmailInbox";
 import LiveInterview from "@/pages/LiveInterview";
+import Login from "@/pages/Login";
 
 function Router() {
   return (
     <Switch>
       <Route path={"/"} component={Home} />
+      <Route path={"/login"} component={Login} />
       <Route path={"/dashboard"} component={Dashboard} />
       <Route path={"/meetings"} component={Meetings} />
       <Route path={"/meetings/:id"} component={MeetingDetail} />
