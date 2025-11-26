@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
-import { useLocation } from "wouter";
+import { useLocation, Link } from "wouter";
 import { APP_LOGO, APP_TITLE } from "@/const";
 import { Loader2 } from "lucide-react";
 
@@ -92,7 +92,14 @@ export default function Login() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="login-password">كلمة المرور</Label>
+                    <div className="flex items-center justify-between">
+                      <Label htmlFor="login-password">كلمة المرور</Label>
+                      <Link href="/forgot-password">
+                        <Button variant="link" className="h-auto p-0 text-xs text-purple-600 hover:text-purple-700">
+                          نسيت كلمة المرور؟
+                        </Button>
+                      </Link>
+                    </div>
                     <Input
                       id="login-password"
                       type="password"

@@ -217,3 +217,18 @@ export const emotionAnalysis = mysqlTable("emotion_analysis", {
 
 export type EmotionAnalysis = typeof emotionAnalysis.$inferSelect;
 export type InsertEmotionAnalysis = typeof emotionAnalysis.$inferInsert;
+
+/**
+ * Password Reset Tokens - رموز إعادة تعيين كلمة المرور
+ */
+export const passwordResetTokens = mysqlTable("password_reset_tokens", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(),
+  token: varchar("token", { length: 255 }).notNull().unique(),
+  expiresAt: timestamp("expiresAt").notNull(),
+  used: boolean("used").default(false).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type PasswordResetToken = typeof passwordResetTokens.$inferSelect;
+export type InsertPasswordResetToken = typeof passwordResetTokens.$inferInsert;

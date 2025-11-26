@@ -25,6 +25,14 @@ import { ragService } from "./services/rag";
 import { generateDailyBriefing } from "./services/dailyBriefing";
 import { createBriefing, getBriefingByUserAndDate } from "./db";
 import { getEmotionAnalysis, getEmotionSummary } from "./db-emotions";
+import { 
+  createPasswordResetToken, 
+  getPasswordResetToken, 
+  markTokenAsUsed, 
+  getUserByEmail,
+  updateUserPassword 
+} from "./db";
+import { sendPasswordResetEmail } from "./services/emailService";
 
 // Initialize RAG service on startup
 ragService.initialize().catch(console.error);
@@ -146,6 +154,72 @@ export const appRouter = router({
             name: user.name,
           },
         };
+      }),
+    
+    // Request password reset
+    requestPasswordReset: publicProcedure
+      .input(z.object({
+        email: z.string().email(),
+      }))
+      .mutation(async ({ input }) => {
+        const { email } = input;
+        
+        // Find user by email
+        const user = await getUserByEmail(email);
+        if (!user) {
+          // لا نكشف إذا كان البريد موجود أم لا (أمان)
+          return { success: true };
+        }
+        
+        // Create reset token
+        const token = await createPasswordResetToken(user.id);
+        
+        // Send email
+        const emailSent = await sendPasswordResetEmail(email, token, user.name || undefined);
+        
+        if (!emailSent) {
+          throw new Error("فشل إرسال البريد الإلكتروني");
+        }
+        
+        return { success: true };
+      }),
+    
+    // Reset password with token
+    resetPassword: publicProcedure
+      .input(z.object({
+        token: z.string(),
+        newPassword: z.string().min(6),
+      }))
+      .mutation(async ({ input }) => {
+        const { token, newPassword } = input;
+        
+        // Get token from database
+        const resetToken = await getPasswordResetToken(token);
+        
+        if (!resetToken) {
+          throw new Error("رمز غير صالح");
+        }
+        
+        // Check if token is used
+        if (resetToken.used) {
+          throw new Error("تم استخدام هذا الرمز مسبقاً");
+        }
+        
+        // Check if token is expired
+        if (new Date() > resetToken.expiresAt) {
+          throw new Error("انتهت صلاحية الرمز");
+        }
+        
+        // Hash new password
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+        
+        // Update user password
+        await updateUserPassword(resetToken.userId, hashedPassword);
+        
+        // Mark token as used
+        await markTokenAsUsed(token);
+        
+        return { success: true };
       }),
     
     logout: publicProcedure.mutation(({ ctx }) => {

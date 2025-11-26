@@ -43,6 +43,13 @@
       "when": 1764006710240,
       "tag": "0005_chief_grim_reaper",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "5",
+      "when": 1764164537191,
+      "tag": "0006_silly_the_hand",
+      "breakpoints": true
     }
   ]
 }

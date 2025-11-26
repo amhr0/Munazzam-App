@@ -16,12 +16,16 @@ import Calendar from "./pages/Calendar";
 import EmailInbox from "@/pages/EmailInbox";
 import LiveInterview from "@/pages/LiveInterview";
 import Login from "@/pages/Login";
+import ForgotPassword from "@/pages/ForgotPassword";
+import ResetPassword from "@/pages/ResetPassword";
 
 function Router() {
   return (
     <Switch>
       <Route path={"/"} component={Home} />
       <Route path={"/login"} component={Login} />
+      <Route path={"/forgot-password"} component={ForgotPassword} />
+      <Route path={"/reset-password"} component={ResetPassword} />
       <Route path={"/dashboard"} component={Dashboard} />
       <Route path={"/meetings"} component={Meetings} />
       <Route path={"/meetings/:id"} component={MeetingDetail} />

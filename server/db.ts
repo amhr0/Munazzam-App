@@ -251,3 +251,69 @@ export async function getBriefingByUserAndDate(userId: number, date: Date): Prom
   
   return result[0];
 }
+
+// Password Reset Tokens
+import { passwordResetTokens, InsertPasswordResetToken, PasswordResetToken } from "../drizzle/schema";
+import crypto from 'crypto';
+
+export async function createPasswordResetToken(userId: number): Promise<string> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  // توليد رمز عشوائي آمن
+  const token = crypto.randomBytes(32).toString('hex');
+  
+  // صلاحية الرمز: ساعة واحدة
+  const expiresAt = new Date();
+  expiresAt.setHours(expiresAt.getHours() + 1);
+  
+  const resetToken: InsertPasswordResetToken = {
+    userId,
+    token,
+    expiresAt,
+    used: false,
+  };
+  
+  await db.insert(passwordResetTokens).values(resetToken);
+  return token;
+}
+
+export async function getPasswordResetToken(token: string): Promise<PasswordResetToken | undefined> {
+  const db = await getDb();
+  if (!db) return undefined;
+  
+  const result = await db.select().from(passwordResetTokens)
+    .where(eq(passwordResetTokens.token, token))
+    .limit(1);
+  
+  return result[0];
+}
+
+export async function markTokenAsUsed(token: string): Promise<void> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.update(passwordResetTokens)
+    .set({ used: true })
+    .where(eq(passwordResetTokens.token, token));
+}
+
+export async function getUserByEmail(email: string) {
+  const db = await getDb();
+  if (!db) return undefined;
+  
+  const result = await db.select().from(users)
+    .where(eq(users.email, email))
+    .limit(1);
+  
+  return result[0];
+}
+
+export async function updateUserPassword(userId: number, hashedPassword: string): Promise<void> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.update(users)
+    .set({ password: hashedPassword })
+    .where(eq(users.id, userId));
+}
