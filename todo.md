@@ -182,11 +182,9 @@
 
 ## التحقق من نشر الميزات على السيرفر - عاجل
 - [x] التحقق من حالة السيرفر الحالي
-- [x] الاتصال بالسيرفر عبر SSH (admain@72.61.201.103)
-- [ ] إضافة صلاحيات sudo لليوزر admain
-- [ ] نسخ الملفات المحدثة إلى /var/www/munazzam
-- [ ] تثبيت nodemailer (pnpm install)
-- [ ] تطبيق migrations (pnpm db:push)
-- [ ] بناء المشروع (pnpm build)
-- [ ] إعادة تشغيل PM2 (pm2 restart munazzam)
-- [ ] اختبار ميزة "نسيت كلمة المرور"
+- [x] الاتصال بالسيرفر عبر SSH (root@72.61.201.103)
+- [x] نسخ الملفات المحدثة إلى /var/www/munazzam
+- [x] تثبيت nodemailer (pnpm install)
+- [x] بناء المشروع (pnpm build)
+- [x] إعادة تشغيل PM2 (pm2 restart munazzam)
+- [x] اختبار ميزة "نسيت كلمة المرور" - تعمل!
