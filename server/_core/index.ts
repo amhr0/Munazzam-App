@@ -66,8 +66,7 @@ async function startServer() {
   server.listen(port, () => {
     console.log(`Server running on http://localhost:${port}/`);
     // Start background worker
-    // startBackgroundWorker(); // Temporarily disabled until DATABASE_URL is fixed
-    console.log(`⚠️ Background worker disabled temporarily`);
+    startBackgroundWorker();
   });
 }
 
