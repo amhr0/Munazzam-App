@@ -1,226 +1,321 @@
-# دليل نشر منظم على VPS
+# دليل النشر - منظم (Munazzam)
 
-## معلومات السيرفر
-- **IP**: 72.61.201.103
-- **SSH**: `ssh root@72.61.201.103`
-- **Panel**: https://hpanel.hostinger.com/vps/1139714/overview
+## نظرة عامة
+
+**منظم** هو نظام ذكاء اصطناعي متكامل للإدارة التنفيذية يوفر:
+- إدارة المهام والاجتماعات والمقابلات
+- مساعد ذكي مباشر (Live Copilot)
+- تحليل الصوت وتحويله إلى نص
+- إنشاء ملخصات يومية تلقائية
+- نظام تسجيل دخول آمن بالإيميل وكلمة المرور
 
 ## المتطلبات الأساسية
 
-### 1. تثبيت Node.js و pnpm
-```bash
-# تثبيت Node.js 20.x
-curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
-sudo apt-get install -y nodejs
+### 1. البرامج المطلوبة
+- **Node.js** 18+ و pnpm
+- **MySQL** 8.0+ أو MariaDB 10.5+
+- **Git**
+- **PM2** (لإدارة العمليات في الإنتاج)
 
-# تثبيت pnpm
-npm install -g pnpm
+### 2. حسابات الخدمات الخارجية
+- **OpenAI API** - للذكاء الاصطناعي (LLM, Whisper, DALL-E)
+- **Gmail** - لإرسال رسائل البريد الإلكتروني
+
+---
+
+## خطوات التثبيت
+
+### الخطوة 1: استنساخ المشروع
+
+```bash
+git clone https://github.com/amhr0/Munazzam-App.git
+cd Munazzam-App
 ```
 
-### 2. تثبيت MySQL/MariaDB
+### الخطوة 2: تثبيت التبعيات
+
 ```bash
-sudo apt update
-sudo apt install -y mariadb-server
-sudo mysql_secure_installation
-
-# إنشاء قاعدة البيانات
-sudo mysql -u root -p
-CREATE DATABASE munazzam CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-CREATE USER 'munazzam'@'localhost' IDENTIFIED BY 'كلمة_سر_قوية';
-GRANT ALL PRIVILEGES ON munazzam.* TO 'munazzam'@'localhost';
-FLUSH PRIVILEGES;
-EXIT;
-```
-
-### 3. تثبيت Nginx
-```bash
-sudo apt install -y nginx
-sudo systemctl enable nginx
-sudo systemctl start nginx
-```
-
-## خطوات النشر
-
-### 1. رفع المشروع للسيرفر
-```bash
-# على جهازك المحلي
-cd /home/ubuntu/munazzam
-tar -czf munazzam.tar.gz --exclude=node_modules --exclude=.git .
-scp munazzam.tar.gz root@72.61.201.103:/root/
-
-# على السيرفر
-ssh root@72.61.201.103
-mkdir -p /var/www/munazzam
-cd /var/www/munazzam
-tar -xzf ~/munazzam.tar.gz
-```
-
-### 2. إعداد متغيرات البيئة
-```bash
-cd /var/www/munazzam
-nano .env
-```
-
-أضف المتغيرات التالية:
-```env
-# Database
-DATABASE_URL=mysql://munazzam:كلمة_السر@localhost:3306/munazzam
-
-# Server
-NODE_ENV=production
-PORT=3000
-
-# JWT
-JWT_SECRET=YOUR_JWT_SECRET_HERE
-
-# Manus OAuth (من لوحة تحكم Manus)
-VITE_APP_ID=your_app_id
-OAUTH_SERVER_URL=https://api.manus.im
-VITE_OAUTH_PORTAL_URL=https://portal.manus.im
-OWNER_OPEN_ID=your_owner_openid
-OWNER_NAME=your_name
-
-# AI APIs
-BUILT_IN_FORGE_API_URL=https://forge-api.manus.im
-BUILT_IN_FORGE_API_KEY=your_forge_api_key
-VITE_FRONTEND_FORGE_API_KEY=your_frontend_key
-VITE_FRONTEND_FORGE_API_URL=https://forge-api.manus.im
-
-# App Info
-VITE_APP_TITLE=منظم
-VITE_APP_LOGO=/logo.svg
-```
-
-### 3. تثبيت التبعيات والبناء
-```bash
-cd /var/www/munazzam
 pnpm install
+```
+
+### الخطوة 3: إعداد قاعدة البيانات
+
+#### إنشاء قاعدة البيانات
+
+```sql
+CREATE DATABASE munazzamdb CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE USER 'munazzamuser'@'localhost' IDENTIFIED BY 'MunazzamDB2024Pass!';
+GRANT ALL PRIVILEGES ON munazzamdb.* TO 'munazzamuser'@'localhost';
+FLUSH PRIVILEGES;
+```
+
+#### تطبيق Schema
+
+```bash
 pnpm db:push
+```
+
+### الخطوة 4: إعداد Environment Variables
+
+أنشئ ملف `.env` في المجلد الرئيسي:
+
+```bash
+# Database
+DATABASE_URL=mysql://munazzamuser:MunazzamDB2024Pass!@localhost:3306/munazzamdb
+
+# JWT Secret (generate using: openssl rand -base64 32)
+JWT_SECRET=your-super-secret-jwt-key-minimum-32-characters-long
+
+# Email (Gmail SMTP)
+GMAIL_USER=your-email@gmail.com
+GMAIL_APP_PASSWORD=your-gmail-app-password
+
+# OpenAI API
+OPENAI_API_KEY=sk-your-openai-api-key
+
+# Application
+FRONTEND_URL=https://your-domain.com
+PORT=3000
+NODE_ENV=production
+```
+
+#### الحصول على Gmail App Password
+
+1. انتقل إلى [Google Account Security](https://myaccount.google.com/security)
+2. فعّل **2-Step Verification**
+3. انتقل إلى [App Passwords](https://myaccount.google.com/apppasswords)
+4. أنشئ App Password جديد واستخدمه في `GMAIL_APP_PASSWORD`
+
+#### الحصول على OpenAI API Key
+
+1. انتقل إلى [OpenAI Platform](https://platform.openai.com/api-keys)
+2. أنشئ API key جديد
+3. انسخه واستخدمه في `OPENAI_API_KEY`
+
+### الخطوة 5: بناء المشروع
+
+```bash
 pnpm build
 ```
 
-### 4. إعداد PM2 للتشغيل المستمر
+### الخطوة 6: تشغيل المشروع
+
+#### للتطوير:
 ```bash
-# تثبيت PM2
+pnpm dev
+```
+
+#### للإنتاج (باستخدام PM2):
+
+```bash
+# تثبيت PM2 عالمياً
 npm install -g pm2
 
-# تشغيل التطبيق
-cd /var/www/munazzam
-pm2 start npm --name "munazzam" -- start
+# إنشاء ملف ecosystem.config.cjs
+cat > ecosystem.config.cjs << 'EOF'
+module.exports = {
+  apps: [{
+    name: 'munazzam',
+    script: 'server/_core/index.ts',
+    interpreter: 'node',
+    interpreter_args: '--loader tsx',
+    instances: 1,
+    autorestart: true,
+    watch: false,
+    max_memory_restart: '1G',
+    env: {
+      NODE_ENV: 'production',
+      PORT: 3000
+    }
+  }]
+};
+EOF
+
+# تشغيل PM2
+pm2 start ecosystem.config.cjs
+
+# حفظ قائمة العمليات
 pm2 save
+
+# تفعيل التشغيل التلقائي عند إعادة التشغيل
 pm2 startup
 ```
 
-### 5. إعداد Nginx كـ Reverse Proxy
-```bash
-sudo nano /etc/nginx/sites-available/munazzam
-```
+---
 
-أضف التكوين التالي:
+## إعداد Nginx (Reverse Proxy)
+
 ```nginx
 server {
     listen 80;
-    server_name your-domain.com;  # أو IP السيرفر
+    server_name your-domain.com;
 
+    # Redirect HTTP to HTTPS
+    return 301 https://$server_name$request_uri;
+}
+
+server {
+    listen 443 ssl http2;
+    server_name your-domain.com;
+
+    # SSL certificates (use Let's Encrypt)
+    ssl_certificate /path/to/fullchain.pem;
+    ssl_certificate_key /path/to/privkey.pem;
+
+    # Security headers
+    add_header X-Frame-Options "SAMEORIGIN" always;
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header X-XSS-Protection "1; mode=block" always;
+
+    # Proxy to Node.js app
     location / {
         proxy_pass http://localhost:3000;
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection 'upgrade';
         proxy_set_header Host $host;
-        proxy_cache_bypass $http_upgrade;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_cache_bypass $http_upgrade;
+    }
+
+    # Static files (if any)
+    location /uploads {
+        alias /path/to/munazzam/uploads;
+        expires 30d;
+        add_header Cache-Control "public, immutable";
     }
 }
 ```
 
-تفعيل الموقع:
-```bash
-sudo ln -s /etc/nginx/sites-available/munazzam /etc/nginx/sites-enabled/
-sudo nginx -t
-sudo systemctl reload nginx
-```
+### تفعيل SSL باستخدام Let's Encrypt
 
-### 6. إعداد SSL (اختياري لكن مُوصى به)
 ```bash
-sudo apt install -y certbot python3-certbot-nginx
+# تثبيت Certbot
+sudo apt install certbot python3-certbot-nginx
+
+# الحصول على شهادة SSL
 sudo certbot --nginx -d your-domain.com
+
+# تجديد تلقائي
+sudo certbot renew --dry-run
 ```
 
-## الصيانة
+---
 
-### عرض السجلات
+## الأوامر المفيدة
+
+### إدارة PM2
 ```bash
+# عرض حالة العمليات
+pm2 status
+
+# عرض logs
 pm2 logs munazzam
-```
 
-### إعادة التشغيل
-```bash
+# إعادة تشغيل
 pm2 restart munazzam
+
+# إيقاف
+pm2 stop munazzam
+
+# حذف
+pm2 delete munazzam
 ```
 
-### التحديث
+### قاعدة البيانات
 ```bash
-cd /var/www/munazzam
-git pull  # إذا كنت تستخدم Git
-# أو ارفع الملفات الجديدة
-pnpm install
+# تطبيق schema changes
 pnpm db:push
-pnpm build
-pm2 restart munazzam
+
+# إنشاء migration جديد
+pnpm db:generate
+
+# عرض studio
+pnpm db:studio
 ```
 
-### النسخ الاحتياطي
+### الاختبار
 ```bash
-# نسخ احتياطي لقاعدة البيانات
-mysqldump -u munazzam -p munazzam > backup_$(date +%Y%m%d).sql
+# تشغيل جميع الاختبارات
+pnpm test
 
-# نسخ احتياطي للملفات المرفوعة (إذا كنت تستخدم تخزين محلي)
-tar -czf uploads_backup_$(date +%Y%m%d).tar.gz /var/www/munazzam/uploads
+# تشغيل اختبار محدد
+pnpm test auth.logout.test.ts
 ```
+
+---
 
 ## استكشاف الأخطاء
 
-### التطبيق لا يعمل
-```bash
-pm2 status
-pm2 logs munazzam --lines 100
-```
+### المشكلة: لا يمكن الاتصال بقاعدة البيانات
 
-### مشاكل قاعدة البيانات
-```bash
-mysql -u munazzam -p munazzam
-SHOW TABLES;
-```
+**الحل:**
+1. تحقق من أن MySQL يعمل: `sudo systemctl status mysql`
+2. تحقق من `DATABASE_URL` في `.env`
+3. تحقق من صلاحيات المستخدم في MySQL
 
-### مشاكل Nginx
-```bash
-sudo nginx -t
-sudo systemctl status nginx
-sudo tail -f /var/log/nginx/error.log
-```
+### المشكلة: فشل إرسال البريد الإلكتروني
+
+**الحل:**
+1. تحقق من `GMAIL_USER` و `GMAIL_APP_PASSWORD`
+2. تأكد من تفعيل 2-Step Verification في Google
+3. تأكد من إنشاء App Password صحيح
+
+### المشكلة: أخطاء OpenAI API
+
+**الحل:**
+1. تحقق من `OPENAI_API_KEY`
+2. تأكد من وجود رصيد كافٍ في حساب OpenAI
+3. تحقق من حدود الاستخدام (rate limits)
+
+---
 
 ## الأمان
 
-1. **تغيير كلمات السر الافتراضية**
-2. **تفعيل Firewall**:
-```bash
-sudo ufw allow 22
-sudo ufw allow 80
-sudo ufw allow 443
-sudo ufw enable
-```
+### توصيات الأمان
 
-3. **تحديث النظام بانتظام**:
-```bash
-sudo apt update && sudo apt upgrade -y
-```
+1. **تغيير كلمات المرور الافتراضية**
+   - غيّر `JWT_SECRET` إلى قيمة عشوائية طويلة
+   - غيّر كلمة مرور قاعدة البيانات
+
+2. **تفعيل Firewall**
+   ```bash
+   sudo ufw allow 22/tcp    # SSH
+   sudo ufw allow 80/tcp    # HTTP
+   sudo ufw allow 443/tcp   # HTTPS
+   sudo ufw enable
+   ```
+
+3. **تحديثات منتظمة**
+   ```bash
+   # تحديث النظام
+   sudo apt update && sudo apt upgrade
+
+   # تحديث dependencies
+   pnpm update
+   ```
+
+4. **Backup منتظم**
+   ```bash
+   # backup قاعدة البيانات
+   mysqldump -u munazzamuser -p munazzamdb > backup_$(date +%Y%m%d).sql
+
+   # backup الملفات
+   tar -czf uploads_backup_$(date +%Y%m%d).tar.gz uploads/
+   ```
+
+---
 
 ## الدعم
 
-للمزيد من المساعدة، راجع:
-- وثائق Manus: https://docs.manus.im
-- وثائق PM2: https://pm2.keymetrics.io/docs
-- وثائق Nginx: https://nginx.org/en/docs/
+للمساعدة أو الإبلاغ عن مشاكل:
+- **GitHub Issues**: [https://github.com/amhr0/Munazzam-App/issues](https://github.com/amhr0/Munazzam-App/issues)
+- **Email**: AMHR551@GMAIL.COM
+
+---
+
+## الترخيص
+
+MIT License - يمكنك استخدام المشروع بحرية للأغراض التجارية وغير التجارية.

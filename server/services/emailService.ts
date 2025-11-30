@@ -17,6 +17,31 @@ const transporter = nodemailer.createTransport({
 });
 
 /**
+ * إرسال بريد إلكتروني عام
+ */
+export async function sendEmail(options: {
+  to: string;
+  subject: string;
+  html: string;
+}): Promise<boolean> {
+  try {
+    const mailOptions = {
+      from: `"منظم - Munazzam" <${process.env.GMAIL_USER}>`,
+      to: options.to,
+      subject: options.subject,
+      html: options.html,
+    };
+
+    await transporter.sendMail(mailOptions);
+    console.log(`[EmailService] Email sent to: ${options.to}`);
+    return true;
+  } catch (error) {
+    console.error('[EmailService] Error sending email:', error);
+    return false;
+  }
+}
+
+/**
  * إرسال رسالة إعادة تعيين كلمة المرور
  */
 export async function sendPasswordResetEmail(
