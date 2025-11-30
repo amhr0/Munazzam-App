@@ -188,3 +188,14 @@
 - [x] بناء المشروع (pnpm build)
 - [x] إعادة تشغيل PM2 (pm2 restart munazzam)
 - [x] اختبار ميزة "نسيت كلمة المرور" - تعمل!
+
+
+## إصلاح DATABASE_URL للسيرفر المباشر - عاجل
+- [x] إعداد قاعدة بيانات MySQL على Hostinger CloudPanel
+- [x] إنشاء database: munazzamdb
+- [x] إنشاء user: munazzamuser
+- [x] تحديث DATABASE_URL في Manus Secrets
+- [x] تعطيل Background Worker مؤقتاً لحل مشكلة ETIMEDOUT
+- [ ] نشر التطبيق من Manus باستخدام Publish
+- [ ] اختبار ميزة "نسيت كلمة المرور" على السيرفر المباشر
+- [ ] إعادة تفعيل Background Worker بعد التأكد من DATABASE_URL
